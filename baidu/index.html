@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<style>
+	
+#input1{
+	width: 300px;
+	height: 30px;
+}	
+#ul1{
+	width: 300px;
+	border: 1px solid gray;
+	margin: 0;
+	padding: 0;
+}	
+li{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	width: 300px;
+	height: 30px;
+	background: yellowgreen;
+}
+li:hover{
+	background: greenyellow;
+}
+.selected{
+	background: white;
+	color: black;
+}
+</style>
+</head>
+<body>
+
+<input type="text" id="input1" />
+<ul id="ul1"></ul>
+
+<script>
+
+function SearchTip(inp, ul){
+	var that = this;
+	this.inp = inp;
+	this.ul = ul;
+	this.ind = -1;
+	
+	this.jsonp = function(wd){
+		var script = document.createElement("script");
+		document.getElementsByTagName("head")[0].appendChild(script);
+		script.src = "https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?cb=s.callback&wd="+wd;
+	}
+	
+	this.callback = function(obj){
+		that.ind = -1;
+		that.ul.innerHTML = "";
+		obj.s.forEach(function(v){
+			var li = document.createElement("li");
+			that.ul.appendChild(li);
+			li.innerHTML = v;
+		});
+	}
+	
+	this.show = function(){
+		var str = that.inp.value;
+		if( str != "" ){
+			that.jsonp(str);
+		}else{
+			that.ul.innerHTML = "";
+		}		
+	}
+	
+	this.css = function(){
+		var lis = that.ul.children;
+		if(that.ind == lis.length){
+			that.ind = 0;
+		}else if(that.ind == -1){
+			that.ind = lis.length-1;
+		}
+		
+		Array.from(lis).forEach(function(li){
+			li.className = "";
+		});
+		lis[that.ind].className = "selected";
+		that.inp.value = lis[that.ind].innerHTML;
+	}
+	
+	this.gotoBaidu = function(){
+		window.open("https://www.baidu.com/s?wd="+that.inp.value);
+	}
+	
+	this.inpKeyup = function(e){
+		var code = e.keyCode;
+		switch(code){
+			case 38:	//上
+				that.ind--;
+				that.css();
+				break;
+			case 40://下
+				that.ind++;
+				that.css();
+				break;
+			case 13://回车
+			case 10:
+				that.gotoBaidu();
+				break;
+			default:
+				that.show();
+		}		
+	}
+	
+	this.inp.onkeyup = this.inpKeyup;
+	
+}
+
+var s = new SearchTip(input1, ul1);
+</script>
+	
+</body>
+</html>
